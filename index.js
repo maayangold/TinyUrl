@@ -8,7 +8,7 @@ import LinksRouter from './Routers/LinksRouter.js';
 import UsersRouter from './Routers/UsersRouter.js';
 import User from './Models/UserModel.js';
 import connectDB from './database.js';
-import LinksController from './controllers/LinksController.js';
+import LinksController from './Controllers/LinksController.js';
 
 const app = express();
 const port = process.env.PORT||5000;
