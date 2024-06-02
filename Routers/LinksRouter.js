@@ -1,14 +1,13 @@
 import express from "express";
-import LinksController from '../controllers/linkController.js';
+import LinksController from '../controllers/LinksController.js';
 
-const linksRouter = express.Router();
+const LinksRouter = express.Router();
 
-linksRouter.get('/', LinksController.getLinks);
-linksRouter.get('/:id', LinksController.getLinkById);
-linksRouter.post('/', LinksController.createLink);
-linksRouter.put('/:id', LinksController.updateLink);
-linksRouter.delete('/:id', LinksController.deleteLink);
-// Redirect
-router.get('/redirect/:id', LinksController.redirectLink);
+LinksRouter.get('/', LinksController.getLinks);
+LinksRouter.get('/:id', LinksController.getLinkById);
+LinksRouter.post('/', LinksController.createLink);
+LinksRouter.put('/:id', LinksController.updateLink);
+LinksRouter.delete('/:id', LinksController.deleteLink);
 
 export default LinksRouter;
+// http://localhost:3000/

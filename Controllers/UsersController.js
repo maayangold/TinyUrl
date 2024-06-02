@@ -1,11 +1,10 @@
-import User from '../models/user.js';
-import bcrypt from 'bcrypt';
+import User from '../Models/UserModel.js';
 
 const UsersController = {
     // שליפת כל המשתמשים
     getUsers: async (req, res) => {
         try {
-            const users = await User.find().populate('links');
+            const users = await User.find();
             res.json(users);
         } catch (err) {
             res.status(500).json({ message: err.message });
@@ -28,9 +27,8 @@ const UsersController = {
     // יצירת משתמש חדש
     createUser: async (req, res) => {
         try {
-            const { name, email, password } = req.body;
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = await User.create({ name, email, password: hashedPassword });
+            const { name, email, password } = req.body;   
+            const newUser = await User.create({ name, email, password });
             res.status(201).json(newUser);
         } catch (err) {
             res.status(400).json({ message: err.message });
@@ -41,8 +39,7 @@ const UsersController = {
     updateUser: async (req, res) => {
         try {
             const { name, email, password } = req.body;
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const user = await User.findByIdAndUpdate(req.params.id, { name, email, password: hashedPassword }, { new: true });
+            const user = await User.findByIdAndUpdate(req.params.id, { name, email, password }, { new: true });
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }

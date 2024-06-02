@@ -1,32 +1,36 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import crypto from 'crypto'
-import jwt from "jsonwebtoken";
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
-
-import  LinksRouter from './Routers/LinksRouter.js'; 
+import LinksRouter from './Routers/LinksRouter.js';
 import UsersRouter from './Routers/UsersRouter.js';
 import User from './Models/UserModel.js';
-
-connectDB();
+import connectDB from './database.js';
+import LinksController from './controllers/LinksController.js';
 
 const app = express();
-const port = process.env.PORT || 5000
+const port = process.env.PORT||5000;
 const secret = "JIs%WCfS#Sl454d5MG";
 
+connectDB();
 
 app.use(cors());
 app.use(bodyParser.json());
 // Routers
+// Define the redirection route
+app.get('/maayan.shortness/:id', LinksController.redirectLink);
 app.use('/links', LinksRouter);
 app.use('/users', UsersRouter);
 
 app.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (user && bcrypt.compareSync(password, user.password)) {
+    const { name, password } = req.body;
+    const user = await User.findOne({ password }); // Find user by name
+
+    // Check if user exists and password matches
+    if (user && user.password === password) {
       const token = jwt.sign(
         { userId: user._id, userName: user.name, roles: ["user"] }, secret);
       res.send({ accessToken: token });
@@ -41,8 +45,7 @@ app.post("/login", async (req, res) => {
 app.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword });
+    const newUser = new User({ name, email, password });
     await newUser.save();
     res.status(201).send({ message: "User registered successfully" });
   } catch (err) {
@@ -59,6 +62,10 @@ app.use("/", (req, res, next) => {
 
 // JWT Middleware comes after  login and register routes
 app.use("/", (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).send({ message: "Unauthorized" });
+  }
   const token = req.headers.authorization.slice(7);
   console.log("token", token);
   try {
